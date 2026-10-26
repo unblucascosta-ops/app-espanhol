@@ -49,3 +49,11 @@ test('sentenceAt devolve a frase em volta da posição', () => {
   const txt = 'Primera frase. La empresa creció mucho. Fin.';
   assert.equal(sentenceAt(txt, txt.indexOf('empresa')), 'La empresa creció mucho.');
 });
+
+test('clipAround encurta frases longas mantendo a palavra', async () => {
+  const { clipAround } = await import('../../js/core/text.js');
+  const long = Array.from({ length: 60 }, (_, i) => `p${i}`).join(' ');
+  const c = clipAround(long, 'p40', 10);
+  assert.ok(c.includes('p40') && c.startsWith('…') && c.endsWith('…'));
+  assert.equal(clipAround('frase curta', 'curta'), 'frase curta');
+});

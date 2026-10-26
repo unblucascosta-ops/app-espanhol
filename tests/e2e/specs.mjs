@@ -89,3 +89,32 @@ test('shadowing: mostra frase, avança e conclui', async ({ page, base, assert }
   await page.locator('text=¡Muy bien!').waitFor();
   assert.ok(true);
 });
+
+test('leitor: colar texto, tocar palavra, ver tradução e criar cartão', async ({ page, base, assert }) => {
+  await page.goto(`${base}#/reader`);
+  await page.click('#paste-text');
+  await page.fill('textarea.paste', 'La empresa creció mucho el año pasado. Los ingresos publicitarios cayeron en picado.');
+  await page.click('text=Abrir no leitor');
+  await page.locator('.reader-text').waitFor();
+  assert.ok(await page.locator('.w.known', { hasText: /^La$/ }).count(), 'artigo é conhecido');
+  await page.click('.w:text-is("creció")');
+  await page.locator('.word-title').waitFor();
+  assert.match(await page.textContent('.sheet'), /forma de: crecer/);
+  assert.match(await page.textContent('.sheet'), /crescer/);
+  await page.click('#make-card');
+  await page.locator('.w.learning:text-is("creció")').waitFor();
+  const card = await page.evaluate(async () => (await (await import('./js/core/store.js')).getAllCards()).find((c) => c.source === 'reader'));
+  assert.equal(card.cloze, 'creció');
+  assert.equal(card.es, 'La empresa creció mucho el año pasado.');
+  assert.equal(card.hint, 'crescer');
+  // Reabre a lista: o texto foi salvo.
+  await page.goto(`${base}#/reader`);
+  await page.locator('text=Meus textos').waitFor();
+});
+
+test('leitor: texto graduado com tradução', async ({ page, base, assert }) => {
+  await page.goto(`${base}#/reader/r-primer-dia`);
+  await page.locator('.reader-text').waitFor();
+  await page.click('text=🇧🇷 Tradução');
+  assert.match(await page.textContent('#view'), /Meu nome é Pedro/);
+});

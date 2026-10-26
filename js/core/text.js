@@ -141,3 +141,16 @@ export function hashId(s, prefix = 'p_') {
 export function countWords(text) {
   return normalize(text).split(' ').filter(Boolean).length;
 }
+
+/** Encurta uma frase longa para no máximo `maxWords` palavras em volta de `word`. */
+export function clipAround(sentence, word, maxWords = 24) {
+  const parts = sentence.split(/\s+/);
+  if (parts.length <= maxWords) return sentence;
+  const target = normalize(word);
+  let idx = parts.findIndex((p) => normalize(p) === target);
+  if (idx < 0) idx = 0;
+  let start = Math.max(0, idx - Math.floor(maxWords / 2));
+  const end = Math.min(parts.length, start + maxWords);
+  start = Math.max(0, end - maxWords);
+  return `${start > 0 ? '… ' : ''}${parts.slice(start, end).join(' ')}${end < parts.length ? ' …' : ''}`;
+}

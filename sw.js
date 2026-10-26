@@ -2,7 +2,7 @@
 // A lista abaixo é gerada por `npm run build:sw` — não edite à mão.
 
 // <precache>
-const VERSION = 'fe1499a5b0';
+const VERSION = '5d9454b421';
 const PRECACHE = [
   "./",
   "css/app.css",
@@ -12,14 +12,17 @@ const PRECACHE = [
   "icons/maskable-512.png",
   "index.html",
   "js/content/challenges.js",
+  "js/content/dictionary.js",
   "js/content/index.js",
   "js/content/lessons/brasileiros.js",
   "js/content/lessons/madrid.js",
   "js/content/lessons/negocios.js",
   "js/content/lessons/social.js",
   "js/content/lessons/universidad.js",
+  "js/content/readings.js",
   "js/core/db.js",
   "js/core/fsrs.js",
+  "js/core/lemma.js",
   "js/core/scheduler.js",
   "js/core/speech.js",
   "js/core/stats.js",
@@ -31,6 +34,7 @@ const PRECACHE = [
   "js/ui/screens/home.js",
   "js/ui/screens/lesson.js",
   "js/ui/screens/lessons.js",
+  "js/ui/screens/reader.js",
   "js/ui/screens/review.js",
   "js/ui/screens/shadow.js",
   "manifest.webmanifest"
