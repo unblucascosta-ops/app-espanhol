@@ -41,7 +41,7 @@ export async function render() {
   const newByLesson = {};
   for (const c of cards) if (c.state === State.New && c.lessonId) newByLesson[c.lessonId] = (newByLesson[c.lessonId] || 0) + 1;
   const current = LESSONS.find((l) => progress[l.id] && newByLesson[l.id]) || LESSONS.find((l) => !progress[l.id]);
-  const challenge = challengeOfDay(dayKey());
+  const challenge = challengeOfDay(dayKey(), await store.workingLevel(cards));
 
   return h(
     'div',

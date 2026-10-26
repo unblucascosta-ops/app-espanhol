@@ -118,3 +118,68 @@ test('leitor: texto graduado com tradução', async ({ page, base, assert }) => 
   await page.click('text=🇧🇷 Tradução');
   assert.match(await page.textContent('#view'), /Meu nome é Pedro/);
 });
+
+test('gramática: explicação e exercícios com resultado salvo', async ({ page, base, assert }) => {
+  await page.goto(`${base}#/grammar`);
+  await page.click('text=Ser × estar');
+  await page.locator('.explain').waitFor();
+  await page.click('#start-quiz');
+  for (let i = 0; i < 8; i++) {
+    await page.locator('.option').first().click();
+    await page.locator('.feedback').waitFor();
+    await page.click('button.btn.primary.big:not(.hidden)');
+  }
+  await page.locator('text=corretas').waitFor();
+  const progress = await page.evaluate(async () => (await import('./js/core/store.js')).getGrammarProgress());
+  assert.ok(progress['ser-estar'].best >= 0);
+});
+
+test('desafio do dia: escrever e salvar no diário', async ({ page, base, assert }) => {
+  await page.goto(`${base}#/challenge?id=c01`);
+  await page.fill('textarea.paste', 'Me llamo Pedro y soy de Brasil. Estudio un máster en Madrid.');
+  assert.match(await page.textContent('#view'), /12 palavras/);
+  await page.click('#save-challenge');
+  await page.locator('text=Diário · 1 texto').waitFor();
+  assert.ok(true);
+});
+
+test('progresso e ajustes: painel, exportar e importar backup', async ({ page, base, assert }) => {
+  // Gera um pouco de histórico respondendo dois cartões.
+  await page.goto(`${base}#/review`);
+  for (let i = 0; i < 2; i++) {
+    await page.locator('.answer-input').waitFor();
+    await page.click('text=Ver resposta');
+    await page.click('.grade.g4');
+  }
+  await page.goto(`${base}#/progress`);
+  await page.locator('#level').waitFor();
+  assert.match(await page.textContent('#view'), /2\b[\s\S]*revisões no total/);
+  // Exporta.
+  await page.goto(`${base}#/settings`);
+  const [download] = await Promise.all([page.waitForEvent('download'), page.click('#export')]);
+  const path = await download.path();
+  const { readFile } = await import('node:fs/promises');
+  const backup = JSON.parse(await readFile(path, 'utf8'));
+  assert.equal(backup.app, 'espanol-madrid');
+  assert.equal(backup.data.reviews.length, 2);
+  // Apaga tudo e importa de volta.
+  page.on('dialog', (d) => d.accept());
+  await page.click('text=Apagar todo o progresso');
+  await page.locator('#start-review').waitFor();
+  await page.goto(`${base}#/settings`);
+  await page.locator('input[type=file]').setInputFiles(path);
+  await page.locator('#level').waitFor();
+  const n = await page.evaluate(async () => (await (await import('./js/core/store.js')).getReviews()).length);
+  assert.equal(n, 2);
+});
+
+test('tema escuro forçado nos ajustes', async ({ page, base, assert }) => {
+  await page.goto(`${base}#/settings`);
+  await page.locator('select').last().waitFor();
+  const themeSelect = page.locator('label.field', { hasText: 'Tema' }).locator('select');
+  await themeSelect.selectOption('dark');
+  assert.equal(await page.getAttribute('html', 'data-theme'), 'dark');
+  await page.reload();
+  await page.locator('#view .topbar').waitFor();
+  assert.equal(await page.getAttribute('html', 'data-theme'), 'dark');
+});

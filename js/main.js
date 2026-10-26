@@ -3,6 +3,7 @@
 import { getSettings, addStudyTime } from './core/store.js';
 import { configureSpeech } from './core/speech.js';
 import { h } from './ui/dom.js';
+import { applyTheme } from './ui/theme.js';
 
 // Cada rota carrega a tela sob demanda. `full: true` esconde a barra inferior.
 const ROUTES = [
@@ -33,7 +34,7 @@ function match(hash) {
   return { route: ROUTES[0], params: {}, query };
 }
 
-export function navigate(hash) {
+function navigate(hash) {
   if (location.hash === hash) render();
   else location.hash = hash;
 }
@@ -61,12 +62,6 @@ async function render() {
     console.error(err);
     view.replaceChildren(h('div.card', h('h2', 'Ops, algo deu errado'), h('p.muted', String(err.message || err)), h('a.btn', { href: '#/' }, 'Voltar ao início')));
   }
-}
-
-export function applyTheme(theme) {
-  const root = document.documentElement;
-  if (theme === 'dark' || theme === 'light') root.dataset.theme = theme;
-  else delete root.dataset.theme;
 }
 
 // Tempo de estudo: conta enquanto o app está visível e houve interação no último minuto.

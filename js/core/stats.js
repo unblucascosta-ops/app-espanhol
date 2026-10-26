@@ -32,10 +32,10 @@ export function bestStreak(days) {
 }
 
 /** Palavras "aprendidas": palavras-alvo de cartões que já saíram da fase inicial. */
-export function learnedWords(cards, knownWords = []) {
-  const set = new Set(knownWords);
+export function learnedWords(cards, lemmaFn = (w) => w.toLowerCase()) {
+  const set = new Set();
   for (const c of cards) {
-    if (c.state === State.Review && c.cloze) set.add(c.cloze.toLowerCase());
+    if (c.state === State.Review && c.cloze) set.add(lemmaFn(c.cloze));
   }
   return set;
 }

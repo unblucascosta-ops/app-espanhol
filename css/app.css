@@ -148,7 +148,8 @@ p { margin: 0 0 0.75rem; }
 .row { display: flex; align-items: center; gap: 12px; }
 .row .grow { flex: 1; min-width: 0; }
 .stack > * + * { margin-top: 12px; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.grid2 > .card { margin-bottom: 0; }
 .emoji { font-size: 1.8rem; line-height: 1; flex: none; }
 .chev { color: var(--muted); font-size: 1.4rem; }
 .section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 20px 4px 8px; }

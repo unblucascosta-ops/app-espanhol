@@ -4,6 +4,8 @@ import * as db from './db.js';
 import { newCardState, State } from './fsrs.js';
 import { dayKey } from './time.js';
 import { hashId } from './text.js';
+import { lemmaOf } from './lemma.js';
+import { learnedWords, estimateLevel } from './stats.js';
 import { LESSONS, getLesson } from '../content/index.js';
 
 export const DEFAULT_SETTINGS = {
@@ -18,11 +20,11 @@ export const DEFAULT_SETTINGS = {
 };
 
 // ---------- kv ----------
-async function kvGet(key, fallback) {
+export async function kvGet(key, fallback) {
   const row = await db.get('kv', key);
   return row ? row.value : fallback;
 }
-const kvSet = (key, value) => db.put('kv', { key, value });
+export const kvSet = (key, value) => db.put('kv', { key, value });
 
 let settingsCache = null;
 export async function getSettings() {
@@ -160,6 +162,30 @@ export async function addCustomCard({ es, cloze, hint = '', pt = '', source = 'r
   };
   await putCard(card);
   return { card, created: true };
+}
+
+// ---------- vocabulário e nível ----------
+/** Palavras aprendidas no SRS + marcadas como conhecidas no leitor, e o nível estimado. */
+export async function vocabulary(cards) {
+  cards ||= await getAllCards();
+  const srs = learnedWords(cards, lemmaOf);
+  const marked = (await getWords()).filter((w) => w.status === 'known').map((w) => w.word);
+  const all = new Set([...srs, ...marked]);
+  return { srs: srs.size, marked: marked.length, total: all.size, ...estimateLevel(all.size) };
+}
+
+/** Nível para escolher desafios: no mínimo A1. */
+export async function workingLevel(cards) {
+  const v = await vocabulary(cards);
+  return v.level === 'Pré-A1' ? 'A1' : v.level;
+}
+
+// ---------- gramática ----------
+export const getGrammarProgress = () => kvGet('grammar', {});
+export async function saveGrammarScore(id, score) {
+  const progress = await getGrammarProgress();
+  progress[id] = { best: Math.max(score, progress[id]?.best ?? 0), last: score, ts: Date.now() };
+  await kvSet('grammar', progress);
 }
 
 // ---------- palavras conhecidas (leitor) ----------

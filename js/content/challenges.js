@@ -41,11 +41,18 @@ export const CHALLENGES = [
   { id: 'c35', level: 'B2', title: 'El futuro de los medios', prompt: '¿Cómo serán los medios de comunicación dentro de diez años? Argumenta.', useful: ['Es probable que…', 'Todo indica que…', 'A no ser que…', 'En definitiva…'] },
 ];
 
-/** Desafio do dia: muda a cada dia, sempre o mesmo para a mesma data. */
-export function challengeOfDay(dayKeyStr) {
+const ORDER = ['A1', 'A2', 'B1', 'B2', 'C1'];
+
+/**
+ * Desafio do dia: muda a cada dia, sempre o mesmo para a mesma data.
+ * `maxLevel` limita aos desafios até o seu nível (ex.: 'A2' → A1 e A2).
+ */
+export function challengeOfDay(dayKeyStr, maxLevel = 'B2') {
   const [y, m, d] = dayKeyStr.split('-').map(Number);
   const n = Math.floor(Date.UTC(y, m - 1, d) / DAY_MS);
-  return CHALLENGES[n % CHALLENGES.length];
+  const max = Math.max(0, ORDER.indexOf(maxLevel));
+  const pool = CHALLENGES.filter((c) => ORDER.indexOf(c.level) <= max);
+  return pool[n % pool.length];
 }
 
 export const CHECKLIST = [

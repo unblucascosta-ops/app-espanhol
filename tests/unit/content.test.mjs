@@ -36,3 +36,26 @@ test('lições têm nível, título e introdução', () => {
     assert.ok(l.title && l.intro && l.emoji, l.id);
   }
 });
+
+test('pílulas de gramática: respostas válidas e ids únicos', async () => {
+  const { GRAMMAR } = await import('../../js/content/grammar/index.js');
+  assert.equal(new Set(GRAMMAR.map((g) => g.id)).size, GRAMMAR.length);
+  for (const g of GRAMMAR) {
+    assert.ok(g.html && g.exercises.length >= 5, g.id);
+    for (const ex of g.exercises) {
+      assert.ok(ex.answer >= 0 && ex.answer < ex.options.length, `${g.id}: ${ex.q}`);
+      assert.ok(ex.explain, `${g.id}: ${ex.q} sem explicação`);
+    }
+  }
+});
+
+test('desafios e textos graduados bem formados', async () => {
+  const { CHALLENGES, challengeOfDay } = await import('../../js/content/challenges.js');
+  const { READINGS } = await import('../../js/content/readings.js');
+  assert.equal(new Set(CHALLENGES.map((c) => c.id)).size, CHALLENGES.length);
+  assert.ok(challengeOfDay('2026-10-26') !== challengeOfDay('2026-10-27'));
+  for (const r of READINGS) {
+    assert.ok(r.es && r.pt && r.title && r.level, r.id);
+    assert.equal(r.es.split('\n\n').length, r.pt.split('\n\n').length, `parágrafos da tradução: ${r.id}`);
+  }
+});
