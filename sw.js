@@ -2,7 +2,7 @@
 // A lista abaixo é gerada por `npm run build:sw` — não edite à mão.
 
 // <precache>
-const VERSION = 'ca32d539b9';
+const VERSION = 'b611c72625';
 const PRECACHE = [
   "./",
   "css/app.css",

@@ -123,22 +123,23 @@ export async function startLesson(lessonId) {
   return fresh.length;
 }
 
-/** Se faltam cartões novos para hoje, inicia a próxima lição do currículo. */
+/** Se faltam cartões novos para hoje, inicia as próximas lições do currículo. Devolve as lições iniciadas. */
 export async function ensureNewCards(extra = 0) {
   const settings = await getSettings();
   const cards = await getAllCards();
   const today = await getDay();
   const needed = settings.newPerDay + extra - today.newCards;
   let available = cards.filter((c) => c.state === State.New).length;
-  if (available >= needed) return null;
+  if (available >= needed) return [];
   const progress = await getLessonProgress();
+  const started = [];
   for (const lesson of LESSONS) {
     if (available >= needed) break;
     if (progress[lesson.id]) continue;
     available += await startLesson(lesson.id);
-    return lesson;
+    started.push(lesson);
   }
-  return null;
+  return started;
 }
 
 /** Cartão criado pelo usuário (leitor ou manual). */
