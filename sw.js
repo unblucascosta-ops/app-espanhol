@@ -2,7 +2,7 @@
 // A lista abaixo é gerada por `npm run build:sw` — não edite à mão.
 
 // <precache>
-const VERSION = 'c855a16fa3';
+const VERSION = 'fe1499a5b0';
 const PRECACHE = [
   "./",
   "css/app.css",
@@ -29,7 +29,10 @@ const PRECACHE = [
   "js/main.js",
   "js/ui/dom.js",
   "js/ui/screens/home.js",
+  "js/ui/screens/lesson.js",
+  "js/ui/screens/lessons.js",
   "js/ui/screens/review.js",
+  "js/ui/screens/shadow.js",
   "manifest.webmanifest"
 ];
 // </precache>

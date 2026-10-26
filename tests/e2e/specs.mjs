@@ -64,3 +64,28 @@ test('funciona offline depois da primeira visita', async ({ page, context, base,
   await page.locator('.answer-input').waitFor();
   assert.ok(true);
 });
+
+test('lições: lista, detalhe e adicionar à revisão', async ({ page, base, assert }) => {
+  await page.goto(`${base}#/lessons`);
+  await page.locator('text=Sobrevivência em Madrid').waitFor();
+  assert.ok((await page.locator('a.card.link').count()) >= 27);
+  await page.click('text=B1');
+  assert.ok((await page.locator('a.card.link').count()) < 27, 'filtro por nível');
+  await page.click('text=Todos');
+  await page.click('text=En el metro');
+  await page.locator('.intro').waitFor();
+  assert.equal(await page.locator('.phrase').count(), 16);
+  await page.click('#start-lesson');
+  await page.locator('text=Na sua revisão diária').waitFor();
+  const n = await page.evaluate(async () => (await (await import('./js/core/store.js')).getAllCards()).filter((c) => c.lessonId === 'metro').length);
+  assert.equal(n, 16);
+});
+
+test('shadowing: mostra frase, avança e conclui', async ({ page, base, assert }) => {
+  await page.goto(`${base}#/shadow?lesson=bar`);
+  await page.locator('.shadow-phrase').waitFor();
+  assert.match(await page.textContent('.review-top'), /1\/16/);
+  for (let i = 0; i < 16; i++) await page.click('button.btn.primary');
+  await page.locator('text=¡Muy bien!').waitFor();
+  assert.ok(true);
+});
