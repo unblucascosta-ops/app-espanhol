@@ -124,11 +124,11 @@ export async function startLesson(lessonId) {
 }
 
 /** Se faltam cartões novos para hoje, inicia a próxima lição do currículo. */
-export async function ensureNewCards() {
+export async function ensureNewCards(extra = 0) {
   const settings = await getSettings();
   const cards = await getAllCards();
   const today = await getDay();
-  const needed = settings.newPerDay - today.newCards;
+  const needed = settings.newPerDay + extra - today.newCards;
   let available = cards.filter((c) => c.state === State.New).length;
   if (available >= needed) return null;
   const progress = await getLessonProgress();

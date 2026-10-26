@@ -183,3 +183,10 @@ test('tema escuro forçado nos ajustes', async ({ page, base, assert }) => {
   await page.locator('#view .topbar').waitFor();
   assert.equal(await page.getAttribute('html', 'data-theme'), 'dark');
 });
+
+test('estudar +5 novos inicia a próxima lição quando as atuais acabam', async ({ page, base, assert }) => {
+  await page.goto(`${base}#/review?extra=20`);
+  await page.locator('.answer-input').waitFor();
+  const lessons = await page.evaluate(async () => Object.keys(await (await import('./js/core/store.js')).getLessonProgress()));
+  assert.ok(lessons.length >= 2, `lições iniciadas: ${lessons}`);
+});

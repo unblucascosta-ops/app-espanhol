@@ -25,11 +25,11 @@ const FEEDBACK = {
 };
 
 export async function render({ query }) {
-  await store.ensureNewCards();
+  const extra = Number(query.extra || 0);
+  await store.ensureNewCards(extra);
   const settings = await store.getSettings();
   const today = await store.getDay();
   const cards = new Map((await store.getAllCards()).map((c) => [c.id, c]));
-  const extra = Number(query.extra || 0);
   let session = buildSession([...cards.values()], Date.now(), {
     newPerDay: settings.newPerDay + extra,
     newDoneToday: today.newCards,
