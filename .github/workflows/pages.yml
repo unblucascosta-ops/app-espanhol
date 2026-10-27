@@ -1,5 +1,5 @@
 # Publica o app no GitHub Pages a cada push na branch main.
-# Ative em: Settings → Pages → Source: "GitHub Actions".
+# Tenta ativar o Pages sozinho; se falhar, ative em: Settings → Pages → Source: "GitHub Actions".
 name: Deploy no GitHub Pages
 
 on:
@@ -30,6 +30,8 @@ jobs:
       - run: npm run build:sw
       - run: npm test
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
